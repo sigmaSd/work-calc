@@ -1,6 +1,7 @@
-import { ListView, HorizontalBox, VerticalBox, Button, LineEdit, ScrollView } from "std-widgets.slint";
+import { ListView, Button, LineEdit, ScrollView } from "std-widgets.slint";
 
 struct Client {
+    id: int,
     name: string,
     honoraire: float,
 }
@@ -12,7 +13,7 @@ export component App inherits Window {
     background: #f0f0f0;
     in-out property <[Client]> clients: [];
     callback addClient(string, string);
-    callback removeClient(Client);
+    callback removeClient(int);
     callback removeAllClients();
     pure callback calcTotal() -> string;
     pure callback startsWith(string, string) -> bool;
@@ -96,7 +97,7 @@ export component App inherits Window {
                         Button {
                             text: "Remove";
                             clicked => {
-                                root.removeClient(client);
+                                root.removeClient(client.id);
                             }
                         }
                     }
