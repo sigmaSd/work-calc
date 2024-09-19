@@ -27,11 +27,13 @@ export component App inherits Window {
             name := LineEdit {
                 width: 40%;
                 placeholder-text: "Name";
+                font-size: 16px;
             }
 
             honoraire := LineEdit {
                 width: 40%;
                 placeholder-text: "Honoraire";
+                font-size: 16px;
             }
 
             Button {
@@ -47,6 +49,9 @@ export component App inherits Window {
 
         Text {
             text: root.calcTotal();
+            font-size: 14px;
+            font-weight: 700;
+            color: #333333;
         }
 
         ListView {
@@ -64,6 +69,8 @@ export component App inherits Window {
                             width: 40%;
                             text: client.name;
                             font-size: 16px;
+                            font-weight: 600;
+                            color: #333333;
                             vertical-alignment: center;
                         }
 
@@ -71,6 +78,8 @@ export component App inherits Window {
                             width: 40%;
                             text: client.honoraire;
                             font-size: 16px;
+                            font-weight: 600;
+                            color: #333333;
                             vertical-alignment: center;
                         }
 
