@@ -13,8 +13,11 @@ export component App inherits Window {
     in-out property <[Client]> clients: [];
     callback addClient(string, string);
     callback removeClient(Client);
+    callback removeAllClients();
     pure callback calcTotal() -> string;
     pure callback startsWith(string, string) -> bool;
+
+    property <bool> show-confirmation-dialog: false;
 
     VerticalLayout {
         padding: 20px;
@@ -25,13 +28,13 @@ export component App inherits Window {
             height: 40px;
 
             name := LineEdit {
-                width: 40%;
+                width: 30%;
                 placeholder-text: "Name";
                 font-size: 16px;
             }
 
             honoraire := LineEdit {
-                width: 40%;
+                width: 30%;
                 placeholder-text: "Honoraire";
                 font-size: 16px;
             }
@@ -43,6 +46,13 @@ export component App inherits Window {
                     root.addClient(name.text, honoraire.text);
                     name.text = "";
                     honoraire.text = "";
+                }
+            }
+
+            Button {
+                text: "Remove All";
+                clicked => {
+                    show-confirmation-dialog = true;
                 }
             }
         }
@@ -95,6 +105,41 @@ export component App inherits Window {
                 Rectangle {
                     height: 1px;
                     background: #e0e0e0;
+                }
+            }
+        }
+    }
+
+    if show-confirmation-dialog: Dialog {
+        Rectangle {
+            background: white;
+            border-radius: 4px;
+            VerticalLayout {
+                padding: 20px;
+                spacing: 20px;
+                Text {
+                    text: "Are you sure you want to remove all clients?";
+                    font-size: 16px;
+                }
+
+                HorizontalLayout {
+                    alignment: end;
+                    spacing: 10px;
+                    Button {
+                        text: "Cancel";
+                        clicked => {
+                            show-confirmation-dialog = false;
+                        }
+                    }
+
+                    Button {
+                        text: "Confirm";
+                        primary: true;
+                        clicked => {
+                            root.removeAllClients();
+                            show-confirmation-dialog = false;
+                        }
+                    }
                 }
             }
         }

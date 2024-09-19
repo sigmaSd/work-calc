@@ -5,6 +5,7 @@ interface App {
   calcTotal: () => string;
   addClient: (name: string, honoraire: string) => void;
   removeClient: (client: Client) => void;
+  removeAllClients: () => void;
   startsWith: (str: string, prefix: string) => boolean;
   run: () => Promise<void>;
 }
@@ -40,9 +41,10 @@ if (import.meta.main) {
       }
     }
 
-    return `Total clients: ${totalClients.toFixed(2)}
-Total certificats: ${totalCertif.toFixed(2)}
-Total: ${(totalClients + totalCertif).toFixed(2)}`;
+    return `Total clients:    ${totalClients.toFixed(2)}
+Total (- 40 / 2):    ${((totalClients - 40) / 2).toFixed(2)}
+Total certificats:    ${totalCertif.toFixed(2)}
+Total:    ${(totalClients + totalCertif).toFixed(2)}`;
   };
   app.addClient = function (name, honoraire) {
     if (!name || !honoraire) return;
@@ -59,6 +61,10 @@ Total: ${(totalClients + totalCertif).toFixed(2)}`;
     );
     app.clients = newClients;
     saveClients(newClients);
+  };
+  app.removeAllClients = function () {
+    app.clients = [];
+    saveClients([]);
   };
   app.startsWith = function (str, prefix) {
     return str.startsWith(prefix);
