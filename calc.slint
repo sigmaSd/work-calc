@@ -21,6 +21,7 @@ export component App inherits Window {
     callback onNoteChanged(string);
 
     property <bool> show-confirmation-dialog: false;
+    property <bool> show-note: false;
 
     HorizontalLayout {
         VerticalLayout {
@@ -114,10 +115,10 @@ export component App inherits Window {
             }
         }
 
-        VerticalLayout {
+        if show-note: VerticalLayout {
             padding: 20px;
             Text {
-                text: "Note";
+                text: "Note (Press F1 to hide)";
                 font-size: 14px;
                 font-weight: 700;
             }
@@ -164,6 +165,18 @@ export component App inherits Window {
                     }
                 }
             }
+        }
+    }
+
+    forward-focus: key-handler;
+
+    key-handler := FocusScope {
+        key-pressed(event) => {
+            if (event.text == Key.F1) {
+                show-note = !show-note;
+                return accept;
+            }
+            return reject;
         }
     }
 }
