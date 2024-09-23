@@ -43,7 +43,10 @@ function maxInArray(array: number[]): number {
 
 if (import.meta.main) {
   Deno.env.set("WAYLAND_DISPLAY", "");
-  const ui = slint.loadFile("./calc.slint");
+  const ui = slint.loadSource(
+    await fetch(import.meta.resolve("./calc.slint")).then((res) => res.text()),
+    "main.js",
+  );
   // deno-lint-ignore no-explicit-any
   const app = new (ui as any).App() as App;
 
