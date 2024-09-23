@@ -1,4 +1,4 @@
-import { ListView, Button, LineEdit, ScrollView } from "std-widgets.slint";
+import { ListView, Button, LineEdit, ScrollView, TextEdit } from "std-widgets.slint";
 
 struct Client {
     id: int,
@@ -8,137 +8,158 @@ struct Client {
 
 export component App inherits Window {
     title: "Client Calculator";
-    width: 600px;
+    width: 800px;
     height: 600px;
     background: #f0f0f0;
     in-out property <[Client]> clients: [];
+    in-out property <string> note: "";
     callback addClient(string, string);
     callback removeClient(int);
     callback removeAllClients();
     pure callback calcTotal() -> string;
     pure callback startsWith(string, string) -> bool;
+    callback onNoteChanged(string);
 
     property <bool> show-confirmation-dialog: false;
 
-    VerticalLayout {
-        padding: 20px;
-        spacing: 20px;
+    HorizontalLayout {
+        VerticalLayout {
+            padding: 20px;
+            spacing: 20px;
 
-        HorizontalLayout {
-            spacing: 10px;
-            height: 40px;
+            HorizontalLayout {
+                spacing: 10px;
+                height: 40px;
 
-            name := LineEdit {
-                width: 30%;
-                placeholder-text: "Name";
-                font-size: 16px;
-            }
-
-            honoraire := LineEdit {
-                width: 30%;
-                placeholder-text: "Honoraire";
-                font-size: 16px;
-            }
-
-            Button {
-                text: "Add";
-                primary: true;
-                clicked => {
-                    root.addClient(name.text, honoraire.text);
-                    name.text = "";
-                    honoraire.text = "";
-                }
-            }
-
-            Button {
-                text: "Remove All";
-                clicked => {
-                    show-confirmation-dialog = true;
-                }
-            }
-        }
-
-        Text {
-            text: root.calcTotal();
-            font-size: 14px;
-            font-weight: 700;
-            color: #333333;
-        }
-
-        ListView {
-            for client[i] in clients: VerticalLayout {
-                Rectangle {
-                    height: 60px;
-                    border-radius: 5px;
-                    background: startsWith(client.name, "c ") ? #e0e0e0 : #ffffff;
-
-                    HorizontalLayout {
-                        padding: 10px;
-                        spacing: 10px;
-
-                        Text {
-                            width: 40%;
-                            text: client.name;
-                            font-size: 16px;
-                            font-weight: 600;
-                            color: #333333;
-                            vertical-alignment: center;
-                        }
-
-                        Text {
-                            width: 40%;
-                            text: client.honoraire;
-                            font-size: 16px;
-                            font-weight: 600;
-                            color: #333333;
-                            vertical-alignment: center;
-                        }
-
-                        Button {
-                            text: "Remove";
-                            clicked => {
-                                root.removeClient(client.id);
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    height: 1px;
-                    background: #e0e0e0;
-                }
-            }
-        }
-    }
-
-    if show-confirmation-dialog: Dialog {
-        Rectangle {
-            background: white;
-            border-radius: 4px;
-            VerticalLayout {
-                padding: 20px;
-                spacing: 20px;
-                Text {
-                    text: "Are you sure you want to remove all clients?";
+                name := LineEdit {
+                    width: 30%;
+                    placeholder-text: "Name";
                     font-size: 16px;
                 }
 
-                HorizontalLayout {
-                    alignment: end;
-                    spacing: 10px;
-                    Button {
-                        text: "Cancel";
-                        clicked => {
-                            show-confirmation-dialog = false;
+                honoraire := LineEdit {
+                    width: 30%;
+                    placeholder-text: "Honoraire";
+                    font-size: 16px;
+                }
+
+                Button {
+                    text: "Add";
+                    primary: true;
+                    clicked => {
+                        root.addClient(name.text, honoraire.text);
+                        name.text = "";
+                        honoraire.text = "";
+                    }
+                }
+
+                Button {
+                    text: "Remove All";
+                    clicked => {
+                        show-confirmation-dialog = true;
+                    }
+                }
+            }
+
+            Text {
+                text: root.calcTotal();
+                font-size: 14px;
+                font-weight: 700;
+                color: #333333;
+            }
+
+            ListView {
+                for client[i] in clients: VerticalLayout {
+                    Rectangle {
+                        height: 60px;
+                        border-radius: 5px;
+                        background: startsWith(client.name, "c ") ? #e0e0e0 : #ffffff;
+
+                        HorizontalLayout {
+                            padding: 10px;
+                            spacing: 10px;
+
+                            Text {
+                                width: 40%;
+                                text: client.name;
+                                font-size: 16px;
+                                font-weight: 600;
+                                color: #333333;
+                                vertical-alignment: center;
+                            }
+
+                            Text {
+                                width: 40%;
+                                text: client.honoraire;
+                                font-size: 16px;
+                                font-weight: 600;
+                                color: #333333;
+                                vertical-alignment: center;
+                            }
+
+                            Button {
+                                text: "Remove";
+                                clicked => {
+                                    root.removeClient(client.id);
+                                }
+                            }
                         }
                     }
 
-                    Button {
-                        text: "Confirm";
-                        primary: true;
-                        clicked => {
-                            root.removeAllClients();
-                            show-confirmation-dialog = false;
+                    Rectangle {
+                        height: 1px;
+                        background: #e0e0e0;
+                    }
+                }
+            }
+        }
+
+        VerticalLayout {
+            padding: 20px;
+            Text {
+                text: "Note";
+                font-size: 14px;
+                font-weight: 700;
+            }
+
+            TextEdit {
+                font-size: 14px;
+                text <=> root.note;
+                edited(text) => {
+                    root.onNoteChanged(text);
+                }
+            }
+        }
+
+        if show-confirmation-dialog: Dialog {
+            Rectangle {
+                background: white;
+                border-radius: 4px;
+                VerticalLayout {
+                    padding: 20px;
+                    spacing: 20px;
+                    Text {
+                        text: "Are you sure you want to remove all clients?";
+                        font-size: 16px;
+                    }
+
+                    HorizontalLayout {
+                        alignment: end;
+                        spacing: 10px;
+                        Button {
+                            text: "Cancel";
+                            clicked => {
+                                show-confirmation-dialog = false;
+                            }
+                        }
+
+                        Button {
+                            text: "Confirm";
+                            primary: true;
+                            clicked => {
+                                root.removeAllClients();
+                                show-confirmation-dialog = false;
+                            }
                         }
                     }
                 }

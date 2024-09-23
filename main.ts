@@ -1,12 +1,14 @@
-import * as slint from "npm:slint-ui@1.7.2";
+import * as slint from "npm:slint-ui@1.8.0";
 
 interface App {
   clients: Client[];
+  note: string;
   calcTotal: () => string;
   addClient: (name: string, honoraire: string) => void;
   removeClient: (id: number) => void;
   removeAllClients: () => void;
   startsWith: (str: string, prefix: string) => boolean;
+  onNoteChanged: (text: string) => void;
   run: () => Promise<void>;
 }
 
@@ -23,6 +25,12 @@ function loadClients(): Client[] {
   const clients = localStorage.getItem("clients");
   if (!clients) return [];
   return JSON.parse(clients);
+}
+function saveNote(note: string) {
+  localStorage.setItem("note", note);
+}
+function loadNote(): string {
+  return localStorage.getItem("note") || "";
 }
 
 function maxInArray(array: number[]): number {
@@ -82,7 +90,11 @@ Total:    ${(totalClients + totalCertif).toFixed(2)}`;
   app.startsWith = function (str, prefix) {
     return str.startsWith(prefix);
   };
+  app.onNoteChanged = function (text) {
+    saveNote(text);
+  };
 
+  app.note = loadNote();
   app.clients = loadClients();
   nextId = app.clients.length != 0
     ? (maxInArray([...app.clients].map((client) => client.id)) + 1)
