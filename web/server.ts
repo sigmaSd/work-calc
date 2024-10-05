@@ -6,4 +6,5 @@ Deno.serve((req) => {
   if (path === "/") {
     return serveFile(req, "web/index.html");
   }
+  return serveFile(req, "web/" + path);
 });
