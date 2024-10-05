@@ -125,6 +125,20 @@
                 grid-column: span 2;
             }
         }
+        body.drag-mode {
+            background-color: #ffe6e6;
+        }
+        .drag-mode-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4444;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -150,10 +164,12 @@
         <h3>Note (Press F1 to hide)</h3>
         <textarea id="noteInput" rows="10" cols="30"></textarea>
     </div>
+    <div class="drag-mode-indicator" id="dragModeIndicator">Drag Mode ON</div>
 
     <script>
         let clients = [];
         let nextId = 1;
+        let dragMode = false;
 
         function loadData() {
             const storedClients = localStorage.getItem('clients');
@@ -206,9 +222,11 @@
         function renderClients() {
             const list = document.getElementById('clientList');
             list.innerHTML = '';
-            clients.forEach(client => {
+            clients.forEach((client, index) => {
                 const li = document.createElement('li');
                 li.className = `client-item ${client.name.startsWith('c ') ? 'certificate' : ''}`;
+                li.draggable = dragMode;
+                li.dataset.id = client.id;
                 li.innerHTML = `
                     <span>${client.name}</span>
                     <span>${client.honoraire.toFixed(2)}</span>
@@ -216,6 +234,43 @@
                 `;
                 list.appendChild(li);
             });
+
+            if (dragMode) {
+                addDragListeners();
+            }
+        }
+
+        function addDragListeners() {
+            const clientItems = document.querySelectorAll('.client-item');
+            clientItems.forEach(item => {
+                item.addEventListener('dragstart', dragStart);
+                item.addEventListener('dragover', dragOver);
+                item.addEventListener('drop', drop);
+            });
+        }
+
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const draggedId = parseInt(e.dataTransfer.getData('text'));
+            const dropZoneId = parseInt(e.target.closest('.client-item').dataset.id);
+
+            const draggedIndex = clients.findIndex(c => c.id === draggedId);
+            const dropIndex = clients.findIndex(c => c.id === dropZoneId);
+
+            if (draggedIndex !== -1 && dropIndex !== -1) {
+                const [removed] = clients.splice(draggedIndex, 1);
+                clients.splice(dropIndex, 0, removed);
+                renderClients();
+                saveData();
+            }
         }
 
         function parseNote() {
@@ -291,10 +346,22 @@
             }
         }
 
+        function toggleDragMode() {
+            dragMode = !dragMode;
+            renderClients();
+            document.body.classList.toggle('drag-mode', dragMode);
+            const indicator = document.getElementById('dragModeIndicator');
+            indicator.style.display = dragMode ? 'block' : 'none';
+            console.log(`Drag mode ${dragMode ? 'enabled' : 'disabled'}`);
+        }
+
         document.addEventListener('keydown', function(event) {
             if (event.key === 'F1') {
                 event.preventDefault();
                 toggleNotePopup();
+            } else if (event.key === 'F2') {
+                event.preventDefault();
+                toggleDragMode();
             }
         });
 
