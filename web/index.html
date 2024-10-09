@@ -170,6 +170,7 @@
         let clients = [];
         let nextId = 1;
         let dragMode = false;
+        let showAdvancedStats = false;
 
         function loadData() {
             const storedClients = localStorage.getItem('clients');
@@ -304,25 +305,36 @@
                 }
             });
 
-            const noteTotal = parseNote();
-            let totalText = `
-                Count: ${clients.length}
-                Total clients: ${totalClients.toFixed(2)}
-                Total clients (- 40 / 2): ${((totalClients - 40) / 2).toFixed(2)}
-                Total certificats: ${totalCertif.toFixed(2)}
-                Total: ${(totalClients + totalCertif).toFixed(2)}
-            `;
-
-            if (noteTotal !== null) {
-                const cabTotal = ((totalClients -40 ) /2) + totalCertif + noteTotal;
-                totalText += `
-                Note total: ${noteTotal.toFixed(2)}
-                Total + Note = ${(totalClients + totalCertif + noteTotal).toFixed(2)}
-                Cab Total: ${cabTotal.toFixed(2)}
-                `;
+            let noteTotal = parseNote();
+            if (noteTotal === null) {
+                document.getElementById('totalDisplay').innerText = 'Note parsing failed, verify the format';
+                return
             }
 
-            document.getElementById('totalDisplay').innerText = totalText;
+            let simpleStats = `
+                Count(c): ${clients.length}
+                Total Clients(c): ${(totalClients + totalCertif).toFixed(2)}
+                Total Note: ${noteTotal.toFixed(2)}
+                Total Clients(c) + Note: ${(totalClients + totalCertif + noteTotal).toFixed(2)}
+                Total (Clients(c) - 40) / 2: ${((totalClients + totalCertif - 40) / 2).toFixed(2)}
+                Total (Clients(c) - 40 / 2) + Note: ${(((totalClients + totalCertif - 40) / 2) + noteTotal).toFixed(2)}
+            `;
+
+            let advancedStats = `
+                Count Clients: ${clients.filter(c => !c.name.startsWith('c ')).length}
+                Count Certificats: ${clients.filter(c => c.name.startsWith('c ')).length}
+                Count Total: ${clients.length}
+
+                Total Clients: ${totalClients.toFixed(2)}
+                Total Certificats: ${totalCertif.toFixed(2)}
+                Total Note: ${noteTotal.toFixed(2)}
+
+                Total Clients + Certificats + Note: ${(totalClients + totalCertif + noteTotal).toFixed(2)}
+                Total (Clients - 40) / 2: ${((totalClients - 40) / 2).toFixed(2)}
+                Total (Clients - 40 / 2) + Certificats + Note: ${(((totalClients - 40) / 2) + totalCertif + noteTotal).toFixed(2)}
+            `;
+
+            document.getElementById('totalDisplay').innerText = showAdvancedStats ? advancedStats : simpleStats;
         }
 
         function showConfirmation() {
@@ -355,6 +367,13 @@
             console.log(`Drag mode ${dragMode ? 'enabled' : 'disabled'}`);
         }
 
+        function toggleAdvancedStats(event) {
+            if (event.ctrlKey) {
+                showAdvancedStats = !showAdvancedStats;
+                updateTotal();
+            }
+        }
+
         document.addEventListener('keydown', function(event) {
             if (event.key === 'F1') {
                 event.preventDefault();
@@ -370,6 +389,8 @@
         document.getElementById('noteInput').addEventListener('input', function() {
             saveData();
         });
+
+        document.getElementById('totalDisplay').addEventListener('click', toggleAdvancedStats);
 
         loadData();
     </script>
