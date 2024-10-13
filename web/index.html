@@ -381,9 +381,9 @@
             const zip = new JSZip();
 
             // Add clients data as CSV
-            let csvContent = "Name,Honoraire\n";
+            let csvContent = "Name;Honoraire\n";
             clients.forEach(client => {
-                csvContent += `${client.name},${client.honoraire}\n`;
+                csvContent += `${client.name.replaceAll(";","")};${client.honoraire.toString().replaceAll(";","")}\n`;
             });
             zip.file("clients.csv", csvContent);
 
