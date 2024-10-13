@@ -155,7 +155,7 @@
         </div>
     </div>
     <div class="confirmation-dialog" id="confirmationDialog">
-        <p>Are you sure you want to remove all clients?</p>
+        <p>Are you sure you want to remove all clients and reset the notes?</p>
         <button onclick="removeAllClients()">Confirm</button>
         <button onclick="hideConfirmation()">Cancel</button>
     </div>
@@ -214,6 +214,7 @@
         function removeAllClients() {
             clients = [];
             nextId = 1;
+            document.getElementById('noteInput').value = '';
             renderClients();
             updateTotal();
             saveData();
