@@ -7,6 +7,7 @@
 
     <link rel="manifest" href="/pwa/manifest.json" />
     <script defer src="/pwa/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 
     <title>Client Calculator</title>
     <style>
@@ -149,6 +150,7 @@
                 <input type="number" id="honoraireInput" placeholder="Honoraire">
                 <button onclick="addClient()">Add</button>
                 <button onclick="showConfirmation()">Remove All</button>
+                <button onclick="exportToZip()">Export ZIP</button>
             </div>
             <div class="total" id="totalDisplay"></div>
             <ul class="client-list" id="clientList"></ul>
@@ -373,6 +375,40 @@
                 showAdvancedStats = !showAdvancedStats;
                 updateTotal();
             }
+        }
+
+        async function exportToZip() {
+            const zip = new JSZip();
+
+            // Add clients data as CSV
+            let csvContent = "Name,Honoraire\n";
+            clients.forEach(client => {
+                csvContent += `${client.name},${client.honoraire}\n`;
+            });
+            zip.file("clients.csv", csvContent);
+
+            // Add note content
+            const noteContent = document.getElementById('noteInput').value;
+            zip.file("note.txt", noteContent);
+
+            // Generate the zip file
+            const zipContent = await zip.generateAsync({type: "blob"});
+
+            // Create filename with current date
+            const date = new Date();
+            const dateString = date.getFullYear() + '-' +
+                               String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                               String(date.getDate()).padStart(2, '0');
+
+            // Download the zip file
+            const zipUrl = URL.createObjectURL(zipContent);
+            const link = document.createElement("a");
+            link.href = zipUrl;
+            link.download = `export_${dateString}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(zipUrl);
         }
 
         document.addEventListener('keydown', function(event) {
