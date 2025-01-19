@@ -164,7 +164,7 @@
                 <input type="number" id="honoraireInput" placeholder="Honoraire">
                 <button onclick="addClient()">Add</button>
                 <button onclick="showConfirmation()">Reset</button>
-                <button onclick="exportToZip()">Export ZIP</button>
+                <button onclick="exportToZip()">Export</button>
             </div>
             <div class="total" id="totalDisplay"></div>
             <ul class="client-list" id="clientList"></ul>
@@ -252,7 +252,7 @@
                 li.innerHTML = `
                     <span>${client.name}</span>
                     <span>${client.honoraire.toFixed(2)}</span>
-                    <button onclick="removeClient(${client.id})">Remove</button>
+                    <button onclick="removeClient(${client.id})">X</button>
                 `;
                 list.appendChild(li);
             });
