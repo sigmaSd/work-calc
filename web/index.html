@@ -163,8 +163,7 @@
                 <input type="text" id="nameInput" placeholder="Name">
                 <input type="number" id="honoraireInput" placeholder="Honoraire">
                 <button onclick="addClient()">Add</button>
-                <button onclick="showConfirmation()">Reset</button>
-                <button onclick="exportToZip()">Export</button>
+                <button onclick="resetAndExport()">Reset & Export</button>
             </div>
             <div class="total" id="totalDisplay"></div>
             <ul class="client-list" id="clientList"></ul>
@@ -232,6 +231,8 @@
         }
 
         function removeAllClients() {
+            // Export data before resetting
+            exportToZip();
             clients = [];
             nextId = 1;
             document.getElementById('noteInput').value = '';
@@ -388,11 +389,28 @@
             console.log(`Drag mode ${dragMode ? 'enabled' : 'disabled'}`);
         }
 
+        let lastTouchTime = 0;
+
         function toggleAdvancedStats(event) {
             if (event.ctrlKey) {
                 showAdvancedStats = !showAdvancedStats;
                 updateTotal();
             }
+        }
+
+        function handleDoubleTap(event) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTouchTime;
+            if (tapLength < 500 && tapLength > 0) {
+                showAdvancedStats = !showAdvancedStats;
+                updateTotal();
+            }
+            lastTouchTime = currentTime;
+        }
+
+        function resetAndExport() {
+            // Show confirmation for reset first
+            showConfirmation();
         }
 
         async function exportToZip() {
@@ -481,6 +499,7 @@
         });
 
         document.getElementById('totalDisplay').addEventListener('click', toggleAdvancedStats);
+        document.getElementById('totalDisplay').addEventListener('touchend', handleDoubleTap);
 
         loadData();
     </script>
