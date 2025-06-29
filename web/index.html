@@ -154,6 +154,11 @@
             font-size: 14px;
             display: none;
         }
+        .date {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -165,6 +170,7 @@
                 <button onclick="addClient()">Add</button>
                 <button onclick="resetAndExport()">Reset & Export</button>
             </div>
+            <p class="date" id="date"></p>
             <div class="total" id="totalDisplay"></div>
             <ul class="client-list" id="clientList"></ul>
         </div>
@@ -208,6 +214,7 @@
         function saveData() {
             localStorage.setItem('clients', JSON.stringify(clients));
             localStorage.setItem('note', document.getElementById('noteInput').value);
+            localStorage.setItem('date', document.getElementById('date').textContent);
         }
 
         function addClient() {
@@ -238,8 +245,13 @@
             document.getElementById('noteInput').value = '';
             renderClients();
             updateTotal();
+            updateDate(new Date().toISOString().slice(0, 10));
             saveData();
             hideConfirmation();
+        }
+
+        function updateDate(date) {
+            document.getElementById("date").textContent = date
         }
 
         function renderClients() {
@@ -431,16 +443,13 @@
             const zipContent = await zip.generateAsync({type: "blob"});
 
             // Create filename with current date
-            const date = new Date();
-            const dateString = date.getFullYear() + '-' +
-                               String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                               String(date.getDate()).padStart(2, '0');
+            const date = document.getElementById('date').textContent;
 
             // Download the zip file
             const zipUrl = URL.createObjectURL(zipContent);
             const link = document.createElement("a");
             link.href = zipUrl;
-            link.download = `export_${dateString}.zip`;
+            link.download = `export_${date}.zip`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -478,6 +487,8 @@
             document.getElementById('qrPopup').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
+
+        updateDate(localStorage.getItem("date") ?? new Date().toISOString().slice(0, 10))
 
         document.addEventListener('keydown', function(event) {
             if (event.key === 'F1') {
