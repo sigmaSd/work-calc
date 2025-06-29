@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <head>
 
     <link rel="manifest" href="/pwa/manifest.json" />
@@ -501,6 +501,32 @@
                 event.preventDefault();
                 generateQRCode();
             }
+        });
+
+        let isTwoFinger = false;
+        let hasTriggered = false;
+        let startY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 2) {
+            isTwoFinger = true;
+            hasTriggered = false;
+            startY = e.touches[0].clientY;
+          } else {
+            isTwoFinger = false;
+          }
+        });
+        document.addEventListener('touchmove', (e) => {
+          if (isTwoFinger && !hasTriggered) {
+            const moveDistance = Math.abs(e.touches[0].clientY - startY);
+            if (moveDistance > 20) { // adjust threshold as needed
+              toggleNotePopup();
+              hasTriggered = true;
+            }
+          }
+        });
+        document.addEventListener('touchend', () => {
+          hasTriggered = false;
         });
 
         document.getElementById('overlay').addEventListener('click', toggleNotePopup);
