@@ -239,7 +239,9 @@
 
         async function removeAllClients() {
             // Export data before resetting
-            await exportToZip();
+            if (clients.length > 0) {
+                await exportToZip();
+            }
             clients = [];
             nextId = 1;
             document.getElementById('noteInput').value = '';
