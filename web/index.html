@@ -248,6 +248,7 @@
             renderClients();
             updateTotal();
             updateDate(new Date().toISOString().slice(0, 10));
+            document.getElementById("date").style = "";
             saveData();
             hideConfirmation();
         }
@@ -490,7 +491,14 @@
             document.getElementById('overlay').style.display = 'none';
         }
 
-        updateDate(localStorage.getItem("date") ?? new Date().toISOString().slice(0, 10))
+        const savedDate =  localStorage.getItem("date")
+        const today = new Date().toISOString().slice(0, 10)
+        if (savedDate && savedDate !== today) {
+          document.getElementById("date").style = "color:red;"
+          updateDate(savedDate)
+        } else {
+          updateDate(today)
+        }
 
         document.addEventListener('keydown', function(event) {
             if (event.key === 'F1') {
